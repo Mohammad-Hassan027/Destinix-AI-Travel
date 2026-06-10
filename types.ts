@@ -27,6 +27,10 @@ export interface TravelPackage {
   currency: 'INR' | 'USD' | 'EUR' | 'THB' | 'AED' | 'JPY' | 'GBP' | 'SGD';
   rating: number;
   image: string;
+  thumbnail?: string;
+  images?: string[];
+  coverImage?: string;
+  heroImage?: string;
   gallery?: string[];
   type: 'Domestic' | 'International' | 'Group' | 'Honeymoon' | 'Adventure' | 'Luxury' | 'Budget' | 'Family' | 'Weekend' | 'Ultra-Luxury';
   description: string;

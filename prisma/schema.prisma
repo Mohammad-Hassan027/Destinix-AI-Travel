@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model Booking {
+  id              String   @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String
+  phone           String?
+  address         String?
+  city            String?
+  zipCode         String?
+  packageId       String
+  packageTitle    String
+  packageImage    String?
+  totalAmount     Float
+  currency        String
+  flight          Json?
+  hotel           Json?
+  addons          Json?
+  pricing         Json?
+  numTravelers    Int
+  selectedVehicle String?
+  status          String   @default("Pending")
+  paymentId       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
