@@ -7,6 +7,9 @@ import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 dotenv.config();
 
@@ -35,8 +38,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const BOOKINGS_FILE = path.join(process.cwd(), "bookings.json");
-
 // Verify transporter connection on startup
 const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER;
 const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
@@ -53,48 +54,57 @@ if (smtpUser && smtpPass) {
   console.log("Running in Email Demo Mode. Set SMTP_USER and SMTP_PASS for real emails.");
 }
 
-// Helper to read/write bookings
-const getBookings = () => {
-  if (!fs.existsSync(BOOKINGS_FILE)) return [];
-  try {
-    const data = fs.readFileSync(BOOKINGS_FILE, "utf-8");
-    return JSON.parse(data);
-  } catch (e) {
-    return [];
-  }
-};
-
-const saveBooking = (booking: any) => {
-  const bookings = getBookings();
-  bookings.push({ ...booking, id: Date.now().toString(), createdAt: new Date().toISOString() });
-  fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(bookings, null, 2));
-};
-
 // API Routes
-app.post("/api/bookings", (req, res) => {
+app.post("/api/bookings", async (req, res) => {
   const bookingData = req.body;
   if (!bookingData.firstName || !bookingData.lastName || !bookingData.email) {
     return res.status(400).json({ error: "Missing required fields" });
   }
-  const id = Date.now().toString();
-  const newBooking = { ...bookingData, id, status: 'Pending', createdAt: new Date().toISOString() };
-  const bookings = getBookings();
-  bookings.push(newBooking);
-  fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(bookings, null, 2));
-  res.json({ success: true, message: "Booking details saved successfully", bookingId: id });
+  
+  try {
+    const newBooking = await prisma.booking.create({
+      data: {
+        firstName: bookingData.firstName,
+        lastName: bookingData.lastName,
+        email: bookingData.email,
+        phone: bookingData.phone,
+        address: bookingData.address,
+        city: bookingData.city,
+        zipCode: bookingData.zipCode,
+        packageId: bookingData.packageId,
+        packageTitle: bookingData.packageTitle,
+        packageImage: bookingData.packageImage,
+        totalAmount: bookingData.totalAmount,
+        currency: bookingData.currency,
+        flight: bookingData.flight || null,
+        hotel: bookingData.hotel || null,
+        addons: bookingData.addons || null,
+        pricing: bookingData.pricing || null,
+        numTravelers: bookingData.numTravelers,
+        selectedVehicle: bookingData.selectedVehicle,
+        status: 'Pending'
+      }
+    });
+    res.json({ success: true, message: "Booking details saved successfully", bookingId: newBooking.id });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to save booking" });
+  }
 });
 
-app.post("/api/update-booking", (req, res) => {
+app.post("/api/update-booking", async (req, res) => {
   const { id, updates } = req.body;
   if (!id || !updates) return res.status(400).json({ error: "ID and updates are required" });
 
-  const bookings = getBookings();
-  const index = bookings.findIndex((b: any) => b.id === id);
-  if (index === -1) return res.status(404).json({ error: "Booking not found" });
-
-  bookings[index] = { ...bookings[index], ...updates };
-  fs.writeFileSync(BOOKINGS_FILE, JSON.stringify(bookings, null, 2));
-  res.json({ success: true });
+  try {
+    await prisma.booking.update({
+      where: { id },
+      data: updates
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(404).json({ error: "Booking not found or update failed" });
+  }
 });
 
 app.post("/api/send-otp", async (req, res) => {
@@ -184,13 +194,18 @@ app.post("/api/verify-otp", (req, res) => {
   }
 });
 
-app.get("/api/my-bookings", (req, res) => {
+app.get("/api/my-bookings", async (req, res) => {
   const { email } = req.query;
   if (!email) return res.status(400).json({ error: "Email is required" });
 
-  const bookings = getBookings();
-  const userBookings = bookings.filter((b: any) => b.email.toLowerCase() === (email as string).toLowerCase());
-  res.json(userBookings);
+  try {
+    const userBookings = await prisma.booking.findMany({
+      where: { email: { equals: email as string, mode: 'insensitive' } }
+    });
+    res.json(userBookings);
+  } catch (error: any) {
+    res.status(500).json({ error: "Failed to fetch bookings" });
+  }
 });
 
 app.post("/api/send-confirmation", async (req, res) => {
