@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TravelPackage } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, MapPin, Calendar, Wallet, Sparkles, ShieldCheck, Play, Info, CheckCircle2, Hotel, Utensils, Plane, Car, Camera, UserCheck, XCircle, Loader2, Check, X, Star, MessageSquare } from 'lucide-react';
@@ -85,7 +86,7 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({
   onBook,
   onRequireAuth
 }) => {
-
+const { t } = useTranslation();
 const [images, setImages] = useState<string[]>([]);
 const [activeImg, setActiveImg] = useState<string | null>(pkg.image || (Array.isArray(pkg.gallery) && pkg.gallery.length > 0 ? pkg.gallery[0] : null));
 const [loadingImages, setLoadingImages] = useState(false);
@@ -263,13 +264,13 @@ const handleSubmitReview = async (e: React.FormEvent) => {
   };
 
   const detailedInclusions = [
-    { label: 'Hotel Accommodation', value: '4-Star / 5-Star Premium Stay', icon: 'Hotel' },
-    { label: 'Meals Included', value: 'Daily Breakfast & Dinner', icon: 'Meals' },
-    { label: 'Airport Transfers', value: 'Private AC Vehicle', icon: 'Transfer' },
-    { label: 'Local Transport', value: 'Dedicated Sightseeing Cab', icon: 'Transfer' },
-    { label: 'Sightseeing', value: 'All Major Points Covered', icon: 'Sightseeing' },
-    { label: 'Professional Guide', value: 'Government Approved Guide', icon: 'Guide' },
-    { label: 'Adventure Activities', value: pkg.type === 'Adventure' ? 'Included as per Itinerary' : 'Optional Add-on', icon: 'Activities' }
+    { label: t('packageDetails.inclusionHotel'), value: t('packageDetails.inclusionHotelValue'), icon: 'Hotel' },
+    { label: t('packageDetails.inclusionMeals'), value: t('packageDetails.inclusionMealsValue'), icon: 'Meals' },
+    { label: t('packageDetails.inclusionTransfers'), value: t('packageDetails.inclusionTransfersValue'), icon: 'Transfer' },
+    { label: t('packageDetails.inclusionLocalTransport'), value: t('packageDetails.inclusionLocalTransportValue'), icon: 'Transfer' },
+    { label: t('packageDetails.inclusionSightseeing'), value: t('packageDetails.inclusionSightseeingValue'), icon: 'Sightseeing' },
+    { label: t('packageDetails.inclusionGuide'), value: t('packageDetails.inclusionGuideValue'), icon: 'Guide' },
+    { label: t('packageDetails.inclusionActivities'), value: pkg.type === 'Adventure' ? t('packageDetails.inclusionActivitiesIncluded') : t('packageDetails.inclusionActivitiesOptional'), icon: 'Activities' }
   ];
 
   const priceBreakdown = {
@@ -300,22 +301,22 @@ const handleSubmitReview = async (e: React.FormEvent) => {
             <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Explorations
+            {t('packageDetails.backToExplorations')}
           </button>
-          
+
           {onToggleSave && (
-            <button 
+            <button
               onClick={() => onToggleSave(pkg)}
               className={`flex items-center space-x-2 px-6 py-3 rounded-2xl font-bold transition-all border backdrop-blur-md ${
-                isSaved 
-                ? 'bg-red-500 border-red-500 text-white shadow-lg shadow-red-500/20' 
+                isSaved
+                ? 'bg-red-500 border-red-500 text-white shadow-lg shadow-red-500/20'
                 : 'bg-white/5 border-white/10 text-gray-400 hover:border-red-500/50 hover:text-red-400'
               }`}
             >
               <svg className="w-5 h-5" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
-              <span>{isSaved ? 'Saved' : 'Save Package'}</span>
+              <span>{isSaved ? t('packageDetails.saved') : t('packageDetails.savePackage')}</span>
             </button>
           )}
         </div>
@@ -367,16 +368,16 @@ const handleSubmitReview = async (e: React.FormEvent) => {
 
             {/* Description Section */}
             <section className="bg-white/5 p-8 md:p-12 rounded-[40px] border border-white/10">
-              <h2 className="text-3xl font-serif font-bold text-white mb-6">About this journey</h2>
+              <h2 className="text-3xl font-serif font-bold text-white mb-6">{t('packageDetails.aboutJourney')}</h2>
               <p className="text-xl text-gray-400 leading-relaxed mb-10">{pkg.description}</p>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-center space-x-4 p-6 bg-white/5 rounded-3xl border border-white/5">
                   <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
                     <Calendar className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Duration</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t('packageDetails.duration')}</p>
                     <p className="text-lg text-white font-bold">{pkg.duration}</p>
                   </div>
                 </div>
@@ -385,7 +386,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
                     <Wallet className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Starting Price</p>
+                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t('packageDetails.startingPrice')}</p>
                     <p className="text-lg text-white font-bold">{formatCurrency(pkg.price, pkg.currency)}</p>
                   </div>
                 </div>
@@ -401,7 +402,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
                   </div>
                   <div>
                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                      Location
+                      {t('packageDetails.location')}
                     </p>
                     <p className="text-lg text-white font-bold">
                       {pkg.destination}
@@ -426,7 +427,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
             {/* Itinerary Section */}
             {pkg.itineraryDetails && (
               <section>
-                <h2 className="text-3xl font-serif font-bold text-white mb-8">Detailed Itinerary</h2>
+                <h2 className="text-3xl font-serif font-bold text-white mb-8">{t('packageDetails.detailedItinerary')}</h2>
                 <div className="space-y-4">
                   {pkg.itineraryDetails.map((day) => (
                     <div key={day.day} className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden">
@@ -470,7 +471,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
               <div className="bg-indigo-600/10 border border-indigo-500/20 rounded-[40px] p-8 shadow-2xl backdrop-blur-xl">
                 <h3 className="text-white font-bold text-xl mb-8 flex items-center">
                   <Info className="w-5 h-5 mr-3 text-indigo-400" />
-                  Trip Overview
+                  {t('packageDetails.tripOverview')}
                 </h3>
                 <div className="space-y-6">
                   <div className="flex items-center space-x-4">
@@ -478,7 +479,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
                       <MapPin className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Destination</p>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t('packageDetails.destination')}</p>
                       <p className="text-base text-white font-bold">{pkg.destination}</p>
                     </div>
                   </div>
@@ -487,8 +488,8 @@ const handleSubmitReview = async (e: React.FormEvent) => {
                       <Sparkles className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Best Season</p>
-                      <p className="text-base text-white font-bold">Oct - March</p>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t('packageDetails.bestSeason')}</p>
+                      <p className="text-base text-white font-bold">{t('packageDetails.bestSeasonValue')}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -496,7 +497,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
                       <ShieldCheck className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Travel Type</p>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t('packageDetails.travelType')}</p>
                       <p className="text-base text-white font-bold">{pkg.type}</p>
                     </div>
                   </div>
@@ -518,7 +519,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
                     }}
                     className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 py-5 rounded-2xl text-white font-bold text-lg"
                   >
-                    Secure Your Trip
+                    {t('packageDetails.secureYourTrip')}
                   </motion.button>
                 </div>
               </div>
@@ -528,31 +529,31 @@ const handleSubmitReview = async (e: React.FormEvent) => {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/10 blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-600/20 transition-all" />
                 <h4 className="text-white font-bold mb-8 flex items-center text-lg">
                   <Wallet className="w-5 h-5 mr-3 text-emerald-400" />
-                  Price Breakdown
+                  {t('packageDetails.priceBreakdown')}
                 </h4>
                 <div className="space-y-5 mb-10">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Base Price</span>
+                    <span className="text-gray-500">{t('packageDetails.basePrice')}</span>
                     <span className="text-white font-bold">{formatCurrency(priceBreakdown.base, pkg.currency)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Taxes & Fees</span>
+                    <span className="text-gray-500">{t('packageDetails.taxesFees')}</span>
                     <span className="text-white font-bold">{formatCurrency(priceBreakdown.taxes, pkg.currency)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Service Charge</span>
+                    <span className="text-gray-500">{t('packageDetails.serviceCharge')}</span>
                     <span className="text-white font-bold">{formatCurrency(priceBreakdown.service, pkg.currency)}</span>
                   </div>
                   <div className="pt-6 border-t border-white/10 flex justify-between items-end">
                     <div>
-                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Total Amount</p>
-                      <p className="text-xs text-emerald-400 font-medium">All-Inclusive</p>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t('packageDetails.totalAmount')}</p>
+                      <p className="text-xs text-emerald-400 font-medium">{t('packageDetails.allInclusive')}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-3xl font-bold text-white leading-none">{formatCurrency(pkg.price, pkg.currency)}</p>
                       {pkg.currency !== 'INR' && (
                         <p className="text-[10px] text-indigo-400 font-bold mt-2">
-                          (₹{Math.round(pkg.price * 83.2).toLocaleString()} approx.)
+                          {t('packageDetails.approx', { amount: Math.round(pkg.price * 83.2).toLocaleString() })}
                         </p>
                       )}
                     </div>
@@ -560,7 +561,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
                 </div>
                 <div className="flex items-center p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
                   <CheckCircle2 className="w-4 h-4 mr-2 shrink-0" />
-                  Best price guaranteed
+                  {t('packageDetails.bestPriceGuaranteed')}
                 </div>
               </div>
             </div>
@@ -572,7 +573,7 @@ const handleSubmitReview = async (e: React.FormEvent) => {
           <div className="flex items-center justify-between mb-10">
             <h4 className="text-white font-bold flex items-center text-2xl">
               <CheckCircle2 className="w-8 h-8 mr-4 text-teal-400" />
-              What's Included in This Package
+              {t('packageDetails.whatsIncluded')}
             </h4>
           </div>
           
@@ -597,17 +598,17 @@ const handleSubmitReview = async (e: React.FormEvent) => {
           <div className="pt-12 border-t border-white/10">
             <h4 className="text-white font-bold mb-8 flex items-center text-xl">
               <XCircle className="w-6 h-6 mr-4 text-red-400" />
-              What's Not Included
+              {t('packageDetails.whatsNotIncluded')}
             </h4>
             <div className="bg-red-500/5 border border-red-500/10 rounded-[32px] p-8">
               <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-12">
                 {[
-                  'Personal Expenses & Shopping',
-                  'Extra Adventure Activities (Pay Separately)',
-                  'Optional Upgrades & Extra Rides',
-                  'Travel Insurance (Unless specified)',
-                  'Anything not mentioned in inclusions',
-                  'Tips & Gratuities'
+                  t('packageDetails.exclusionPersonal'),
+                  t('packageDetails.exclusionAdventure'),
+                  t('packageDetails.exclusionUpgrades'),
+                  t('packageDetails.exclusionInsurance'),
+                  t('packageDetails.exclusionOther'),
+                  t('packageDetails.exclusionTips')
                 ].map((item, i) => (
                   <li key={i} className="flex items-center text-gray-400 text-sm">
                     <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 mr-4 shrink-0">
