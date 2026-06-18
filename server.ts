@@ -12,6 +12,10 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import { convertToINR } from "./services/currencyService";
 import { MOCK_PACKAGES } from "./constants.tsx";
+import { createServer } from "http";
+import { Server as SocketServer } from "socket.io";
+import collaborationRoutes from "./server/collaboration/routes/groupRoutes";
+import { initSocket } from "./server/collaboration/socket/socketHandler";
 
 dotenv.config();
 
@@ -59,9 +63,27 @@ const isAdmin = (req: any, res: any, next: any) => {
 const app = express();
 const PORT = 3000;
 
+const httpServer = createServer(app);
+const io = new SocketServer(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"]
+  }
+});
+
+initSocket(io);
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+app.use((req: any, res, next) => {
+  req.io = io;
+  next();
+});
+
+app.use("/api", collaborationRoutes);
+
 
 // Razorpay instance
 const razorpay = new Razorpay({
@@ -292,6 +314,7 @@ app.post("/api/bookings", async (req, res) => {
     const user = await prisma.user.upsert({
       where: { email: bookingData.email },
       update: {
+        name: `${bookingData.firstName || ''} ${bookingData.lastName || ''}`.trim(),
         firstName: bookingData.firstName,
         lastName: bookingData.lastName,
         phone: bookingData.phone,
@@ -301,6 +324,7 @@ app.post("/api/bookings", async (req, res) => {
       },
       create: {
         email: bookingData.email,
+        name: `${bookingData.firstName || ''} ${bookingData.lastName || ''}`.trim(),
         firstName: bookingData.firstName,
         lastName: bookingData.lastName,
         phone: bookingData.phone,
@@ -819,7 +843,7 @@ async function setupVite() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }

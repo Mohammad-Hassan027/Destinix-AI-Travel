@@ -1,29 +1,46 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+datasource db {
+  provider = "postgresql"
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider  = "postgresql"
+enum GroupRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  firstName String
-  lastName  String
-  phone     String?
-  address   String?
-  city      String?
-  zipCode   String?
-  avatarUrl String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  bookings  Booking[]
-  reviews   Review[]
+  id                    String                  @id @default(cuid())
+  email                 String                  @unique
+  name                  String
+  firstName             String?
+  lastName              String?
+  phone                 String?
+  address               String?
+  city                  String?
+  zipCode               String?
+  avatar                String?
+  avatarUrl             String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  
+  ownedGroups           TripGroup[]             @relation("GroupOwner")
+  memberships           TripMember[]
+  suggestions           DestinationSuggestion[]
+  votes                 DestinationVote[]
+  messages              DiscussionMessage[]
+  expenses              Expense[]
+  bookings              Booking[]
+  reviews               Review[]
 }
 
 model TravelPackage {
@@ -45,6 +62,129 @@ model TravelPackage {
   
   bookings     Booking[]
   reviews      Review[]
+}
+
+model TripGroup {
+  id                     String                  @id @default(uuid())
+  name                   String
+  ownerId                String
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+
+  owner                  User                    @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members                TripMember[]
+  itineraries            SharedItinerary[]
+  destinationSuggestions DestinationSuggestion[]
+  discussions            DiscussionMessage[]
+  bookings               SharedBooking[]
+  expenses               Expense[]
+  invitations            TripInvitation[]
+}
+
+model TripMember {
+  id          String    @id @default(uuid())
+  tripGroupId String
+  userId      String
+  role        GroupRole @default(VIEWER)
+
+  tripGroup   TripGroup @relation(fields: [tripGroupId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tripGroupId, userId])
+}
+
+model TripInvitation {
+  id          String           @id @default(uuid())
+  tripGroupId String
+  email       String
+  invitedBy   String
+  status      InvitationStatus @default(PENDING)
+
+  tripGroup   TripGroup        @relation(fields: [tripGroupId], references: [id], onDelete: Cascade)
+  
+  @@unique([tripGroupId, email])
+}
+
+model SharedItinerary {
+  id          String    @id @default(uuid())
+  tripGroupId String
+  title       String
+  description String?
+  dayNumber   Int
+  createdBy   String
+  updatedBy   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tripGroup   TripGroup @relation(fields: [tripGroupId], references: [id], onDelete: Cascade)
+}
+
+model DestinationSuggestion {
+  id              String            @id @default(uuid())
+  tripGroupId     String
+  destinationName String
+  suggestedBy     String
+  createdAt       DateTime          @default(now())
+
+  tripGroup       TripGroup         @relation(fields: [tripGroupId], references: [id], onDelete: Cascade)
+  suggestedByUser User              @relation(fields: [suggestedBy], references: [id], onDelete: Cascade)
+  votes           DestinationVote[]
+}
+
+model DestinationVote {
+  id           String                @id @default(uuid())
+  suggestionId String
+  userId       String
+
+  suggestion   DestinationSuggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([suggestionId, userId])
+}
+
+model DiscussionMessage {
+  id          String    @id @default(uuid())
+  tripGroupId String
+  userId      String
+  message     String
+  createdAt   DateTime  @default(now())
+
+  tripGroup   TripGroup @relation(fields: [tripGroupId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SharedBooking {
+  id               String    @id @default(uuid())
+  tripGroupId      String
+  bookingReference String
+  bookingType      String
+  amount           Float
+  status           String
+  createdAt        DateTime  @default(now())
+
+  tripGroup        TripGroup @relation(fields: [tripGroupId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id          String    @id @default(uuid())
+  tripGroupId String?
+  title       String?
+  amount      Float
+  paidBy      String?
+  
+  userId      String?
+  tripLabel   String?
+  category    String?
+  currency    String    @default("INR")
+  amountINR   Float?
+  note        String?
+
+  createdAt   DateTime  @default(now())
+
+  tripGroup   TripGroup? @relation(fields: [tripGroupId], references: [id], onDelete: Cascade)
+  payer       User?      @relation(fields: [paidBy], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Booking {
@@ -111,18 +251,4 @@ model Review {
 
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   package   TravelPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
-}
-
-model Expense {
-  id        String   @id @default(cuid())
-  userId    String
-  tripLabel String
-  category  String   // "food" | "transport" | "stay" | "activities" | "other"
-  amount    Float
-  currency  String   @default("INR")
-  amountINR Float    // converted value stored at time of entry
-  note      String?
-  createdAt DateTime @default(now())
-
-  @@index([userId])
 }
