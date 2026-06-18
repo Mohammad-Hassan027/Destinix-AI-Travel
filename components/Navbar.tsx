@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Page, User } from '../types';
 
 interface NavbarProps {
@@ -32,7 +32,7 @@ const LanguageSwitcher: React.FC = () => {
 };
 
 const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage, user, onSignInClick, onLogout }) => {
-  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -131,7 +131,13 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage, user, onSi
                         >
                           <span className="mr-3">👤</span> {t('navbar.myDashboard')}
                         </button>
-                        <button
+                        <button 
+                          onClick={() => { navigate('/groups'); setIsUserMenuOpen(false); }}
+                          className="w-full text-left px-5 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors flex items-center"
+                        >
+                          <span className="mr-3">👥</span> Collaborative Trips
+                        </button>
+                        <button 
                           onClick={() => handlePageChange(Page.Profile)}
                           className="w-full text-left px-5 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors flex items-center"
                         >
@@ -204,14 +210,22 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage, user, onSi
                 </button>
               ))}
               {user && (
-                <button
-                  onClick={() => handlePageChange(Page.Profile)}
-                  className={`block w-full text-left text-2xl font-serif font-bold transition-all ${
-                    currentPage === Page.Profile ? 'text-indigo-400' : 'text-gray-300'
-                  }`}
-                >
-                  {t('navbar.myProfile')}
-                </button>
+                <>
+                  <button
+                    onClick={() => handlePageChange(Page.Profile)}
+                    className={`block w-full text-left text-2xl font-serif font-bold transition-all ${
+                      currentPage === Page.Profile ? 'text-indigo-400' : 'text-gray-300'
+                    }`}
+                  >
+                    My Profile
+                  </button>
+                  <button
+                    onClick={() => { navigate('/groups'); setIsMenuOpen(false); }}
+                    className="block w-full text-left text-2xl font-serif font-bold transition-all text-gray-300 hover:text-indigo-400"
+                  >
+                    Collaborative Trips
+                  </button>
+                </>
               )}
             </div>
 

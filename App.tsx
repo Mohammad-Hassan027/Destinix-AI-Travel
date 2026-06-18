@@ -23,6 +23,9 @@ import { PackageSkeleton } from './components/Skeleton';
 import { MOCK_PACKAGES, MOODS, CATEGORIES } from './constants.tsx';
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import { getCurrentUser, logout as performLogout, updateProfile } from './services/authService';
+import CollaborativeTrips from './components/collaboration/CollaborativeTrips';
+import GroupDashboard from './components/collaboration/GroupDashboard';
+
 
 // Wrapper for PackageDetails to handle slug-based routing
 const PackageDetailsWrapper: React.FC<{
@@ -605,6 +608,12 @@ const App: React.FC = () => {
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/groups" element={user ? <CollaborativeTrips user={user} /> : <Navigate to="/" />} />
+              <Route path="/groups/:id" element={user ? <GroupDashboard user={user} tab="dashboard" /> : <Navigate to="/" />} />
+              <Route path="/groups/:id/itinerary" element={user ? <GroupDashboard user={user} tab="itinerary" /> : <Navigate to="/" />} />
+              <Route path="/groups/:id/discussions" element={user ? <GroupDashboard user={user} tab="discussions" /> : <Navigate to="/" />} />
+              <Route path="/groups/:id/expenses" element={user ? <GroupDashboard user={user} tab="expenses" /> : <Navigate to="/" />} />
+              <Route path="/groups/:id/bookings" element={user ? <GroupDashboard user={user} tab="bookings" /> : <Navigate to="/" />} />
               <Route path="/profile" element={user ? <Profile user={user} onUpdateProfile={handleUpdateProfile} onNavigate={handleNavPageChange} onViewPackage={handleViewDetails} /> : <Navigate to="/" />} />
               <Route path="/booking" element={renderBooking()} />
               <Route path="*" element={<Navigate to="/" replace />} />
