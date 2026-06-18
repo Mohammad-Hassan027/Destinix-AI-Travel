@@ -27,19 +27,24 @@ model User {
 }
 
 model TravelPackage {
-  id          String    @id @default(cuid())
-  slug        String    @unique
-  title       String
-  destination String
-  price       Float
-  currency    String
-  duration    String
-  image       String?
-  type        String
-  description String?
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  title        String
+  destination  String
+  price        Float
+  currency     String
+  duration     String
+  image        String?
+  type         String
+  description  String?
+  rating       Float     @default(5.0)
+  gallery      String[]  @default([])
+  highlights   String[]  @default([])
+  bookingCount Int       @default(0)
+  viewCount    Int       @default(0)
   
-  bookings    Booking[]
-  reviews     Review[]
+  bookings     Booking[]
+  reviews      Review[]
 }
 
 model Booking {

@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User as UserType, TripPlan, PriceAlert, TravelPackage, Page, Booking } from '../types';
 import { updateProfile } from '../services/authService';
-import { MOCK_PACKAGES } from '../constants.tsx';
 import PackageCard from './PackageCard';
 import { generateReceiptPDF } from '../utils/receipt';
 import { formatCurrency } from '../utils/currency';
@@ -20,9 +19,10 @@ interface ProfileProps {
   onUpdateProfile: (updates: Partial<UserType>) => void;
   onNavigate: (page: Page) => void;
   onViewPackage: (pkg: TravelPackage) => void;
+  packages: TravelPackage[];
 }
 
-const Profile: React.FC<ProfileProps> = ({ user, onUpdateProfile, onNavigate, onViewPackage }) => {
+const Profile: React.FC<ProfileProps> = ({ user, onUpdateProfile, onNavigate, onViewPackage, packages }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'settings' | 'trips' | 'alerts' | 'bookings' | 'expenses'>('bookings');
   const [formData, setFormData] = useState({
@@ -137,7 +137,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdateProfile, onNavigate, on
     }
   };
 
-  const savedPackages = MOCK_PACKAGES.filter(p => user.savedPackages?.includes(p.id));
+  const savedPackages = packages.filter(p => user.savedPackages?.includes(p.id));
 
   return (
     <div className="pt-32 pb-24 max-w-6xl mx-auto px-4">
@@ -429,7 +429,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdateProfile, onNavigate, on
                               )}
                             <button
                               onClick={() => {
-                                const pkg = MOCK_PACKAGES.find(p => p.id === booking.packageId);
+                                const pkg = packages.find(p => p.id === booking.packageId);
                                 if (pkg) onViewPackage(pkg);
                               }}
                               className="w-full flex items-center justify-center space-x-2 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-xl text-white text-sm font-bold transition-all"
@@ -473,7 +473,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdateProfile, onNavigate, on
               {user.priceAlerts && user.priceAlerts.length > 0 ? (
                 <div className="grid grid-cols-1 gap-4">
                   {user.priceAlerts.map((alert) => {
-                    const pkg = MOCK_PACKAGES.find(p => p.id === alert.targetIdOrName);
+                    const pkg = packages.find(p => p.id === alert.targetIdOrName);
                     return (
                       <div key={alert.id} className="bg-white/5 border border-white/10 rounded-3xl p-6 flex items-center justify-between group hover:border-indigo-500/50 transition-all">
                         <div className="flex items-center space-x-4">
@@ -521,7 +521,7 @@ const Profile: React.FC<ProfileProps> = ({ user, onUpdateProfile, onNavigate, on
               paymentId: activeBookingForReceipt.paymentId || 'N/A',
               date: activeBookingForReceipt.createdAt
             }}
-            pkg={MOCK_PACKAGES.find(p => p.id === activeBookingForReceipt.packageId) || {
+            pkg={packages.find(p => p.id === activeBookingForReceipt.packageId) || {
               title: activeBookingForReceipt.packageTitle,
               destination: activeBookingForReceipt.city || 'Unknown',
               currency: activeBookingForReceipt.currency,

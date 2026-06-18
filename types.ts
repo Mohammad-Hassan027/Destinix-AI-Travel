@@ -185,5 +185,6 @@ export enum Page {
   Auth = 'auth',
   PackageDetails = 'package_details',
   About = 'about',
-  Contact = 'contact'
+  Contact = 'contact',
+  Admin = 'admin'
 }
