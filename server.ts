@@ -15,6 +15,7 @@ import { MOCK_PACKAGES } from "./constants.tsx";
 import { createServer } from "http";
 import { Server as SocketServer } from "socket.io";
 import collaborationRoutes from "./server/collaboration/routes/groupRoutes";
+import destinationGuideRouter from "./server/routes/destinationGuide";
 import { initSocket } from "./server/collaboration/socket/socketHandler";
 
 dotenv.config();
@@ -61,7 +62,7 @@ const isAdmin = (req: any, res: any, next: any) => {
 };
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3001;
 
 const httpServer = createServer(app);
 const io = new SocketServer(httpServer, {
@@ -83,6 +84,7 @@ app.use((req: any, res, next) => {
 });
 
 app.use("/api", collaborationRoutes);
+app.use(destinationGuideRouter);
 
 
 // Razorpay instance

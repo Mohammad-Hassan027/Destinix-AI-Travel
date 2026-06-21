@@ -19,6 +19,7 @@ import CTASection from './components/CTASection';
 import Profile from './components/Profile';
 import ScrollToTop from './components/ScrollToTop';
 import BookingPage from './components/BookingPage';
+import DestinationGuide from './pages/DestinationGuide';
 import { PackageSkeleton } from './components/Skeleton';
 import { MOCK_PACKAGES, MOODS, CATEGORIES } from './constants.tsx';
 import PrivacyPolicy from "./components/PrivacyPolicy";
@@ -633,7 +634,8 @@ const App: React.FC = () => {
               <Route path="/groups/:id/discussions" element={user ? <GroupDashboard user={user} tab="discussions" /> : <Navigate to="/" />} />
               <Route path="/groups/:id/expenses" element={user ? <GroupDashboard user={user} tab="expenses" /> : <Navigate to="/" />} />
               <Route path="/groups/:id/bookings" element={user ? <GroupDashboard user={user} tab="bookings" /> : <Navigate to="/" />} />
-              <Route path="/profile" element={user ? <Profile user={user} onUpdateProfile={handleUpdateProfile} onNavigate={handleNavPageChange} onViewPackage={handleViewDetails} packages={packages} /> : <Navigate to="/" />} />
+              <Route path="/profile" element={user ? <Profile user={user} onUpdateProfile={handleUpdateProfile} onNavigate={handleNavPageChange} onViewPackage={handleViewDetails} /> : <Navigate to="/" />} />
+              <Route path="/destination-guide/:destId" element={<DestinationGuide />} />
               <Route path="/booking" element={renderBooking()} />
               <Route path="/admin" element={user && ['admin@destinix.com', 'admin@travel.com'].includes(user.email.toLowerCase()) ? <AdminDashboard user={user} onLogout={handleLogout} /> : <Navigate to="/" />} />
               <Route path="*" element={<Navigate to="/" replace />} />
