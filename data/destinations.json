@@ -1,0 +1,24 @@
+[
+  {
+    "id": "paris",
+    "name": "Paris, France",
+    "description": "The city of lights, famous for art, architecture, and cuisine.",
+    "attractions": ["Eiffel Tower", "Louvre Museum", "Notre-Dame Cathedral", "Montmartre"],
+    "foodGuide": ["Croissants", "Escargot", "Baguettes", "Crème brûlée"],
+    "transportation": "Metro, buses, bike rentals",
+    "safetyInfo": "Generally safe, watch for pickpockets in tourist areas.",
+    "photographySpots": ["Eiffel Tower at sunset", "Louvre courtyard", "Seine riverbanks"],
+    "travelTips": ["Buy museum passes in advance", "Learn basic French phrases", "Use contactless payment"]
+  },
+  {
+    "id": "dubai",
+    "name": "Dubai, UAE",
+    "description": "A modern metropolis known for luxury shopping, skyscrapers, and desert adventures.",
+    "attractions": ["Burj Khalifa", "Dubai Mall", "Desert Safari", "Palm Jumeirah"],
+    "foodGuide": ["Shawarma", "Al Machboos", "Dates", "Arabic coffee"],
+    "transportation": "Metro, taxis, ride‑hailing apps",
+    "safetyInfo": "Very safe, respect local customs and dress modestly.",
+    "photographySpots": ["Burj Khalifa skyline", "Dubai Marina at night", "Desert dunes at sunrise"],
+    "travelTips": ["Stay hydrated", "Plan desert trips early morning", "Use sunscreen"]
+  }
+]
