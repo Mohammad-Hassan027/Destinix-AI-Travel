@@ -95,6 +95,7 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(() => getCurrentUser());
   const [showAuth, setShowAuth] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<TravelPackage | null>(null);
+  const recentlyViewedScrollRef = React.useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
   const [notification, setNotification] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -164,6 +165,11 @@ const App: React.FC = () => {
   };
 
   const handleViewDetails = (pkg: TravelPackage) => {
+    // persist to localStorage
+    const prev = JSON.parse(localStorage.getItem('destinix_recently_viewed') || '[]') as string[];
+    const updated = [pkg.id, ...prev.filter(id => id !== pkg.id)].slice(0, 4);
+    localStorage.setItem('destinix_recently_viewed', JSON.stringify(updated));
+
     setSelectedPackage(pkg);
     navigate(`/packages/${pkg.slug}`);
   };
@@ -288,6 +294,26 @@ const App: React.FC = () => {
     return unique;
   }, [packages]);
 
+  // Derived recently viewed packages
+  const recentlyViewed = useMemo(() => {
+    try {
+      const storedIds = JSON.parse(localStorage.getItem('destinix_recently_viewed') || '[]') as string[];
+      return storedIds
+        .map(id => packages.find(pkg => pkg.id === id))
+        .filter((pkg): pkg is TravelPackage => !!pkg);
+    } catch (e) {
+      return [];
+    }
+  }, [packages, location.pathname]);
+
+  const scrollRecentlyViewed = (direction: 'left' | 'right') => {
+    if (recentlyViewedScrollRef.current) {
+      const { scrollLeft, clientWidth } = recentlyViewedScrollRef.current;
+      const scrollTo = direction === 'left' ? scrollLeft - clientWidth / 2 : scrollLeft + clientWidth / 2;
+      recentlyViewedScrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  };
+
   const renderHome = () => (
     <>
       <Hero onSearch={handleSearch} />
@@ -371,6 +397,55 @@ const App: React.FC = () => {
           />
         </div>
       </section>
+
+      {/* Recently Viewed Packages Section */}
+      {recentlyViewed.length > 0 && (
+        <section className="py-24 bg-gray-950 border-b border-white/5 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 relative z-10">
+            <div className="mb-12 text-center md:text-left">
+              <h2 className="text-indigo-400 font-bold tracking-widest uppercase mb-4 text-xs">Your History</h2>
+              <h1 className="text-4xl md:text-5xl font-serif font-bold text-white">Recently Viewed</h1>
+            </div>
+
+            <div className="group relative animate-[fadeIn_0.5s_ease-out]">
+              {/* Navigation Arrows (Desktop Only) */}
+              <button 
+                onClick={() => scrollRecentlyViewed('left')}
+                className="absolute -left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-gray-900/80 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex hover:bg-indigo-600 border-indigo-500/50"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <button 
+                onClick={() => scrollRecentlyViewed('right')}
+                className="absolute -right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-gray-900/80 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex hover:bg-indigo-600 border-indigo-500/50"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+              </button>
+
+              <div 
+                ref={recentlyViewedScrollRef}
+                className="flex gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth pb-4"
+              >
+                {recentlyViewed.map((pkg) => (
+                  <div 
+                    key={pkg.id} 
+                    className="snap-start shrink-0 w-[calc(50%-12px)] sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]"
+                  >
+                    <PackageCard 
+                      pkg={pkg} 
+                      onViewDetails={handleViewDetails} 
+                      onToggleSave={handleToggleSave}
+                      onToggleAlert={handleToggleAlert}
+                      isSaved={user?.savedPackages?.includes(pkg.id)}
+                      isAlertSet={user?.priceAlerts?.some(a => a.targetIdOrName === pkg.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Trending Now Section */}
       <section className="py-24 bg-black relative overflow-hidden">
