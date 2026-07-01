@@ -14,7 +14,7 @@ import { chatWithAdvisor } from "../services/geminiService";
 // we can unit-test it independently of React / jsdom.
 // ---------------------------------------------------------------------------
 async function fetchAiSuggestions(searchQuery: string): Promise<string[]> {
-  const response = await (chatWithAdvisor as ReturnType<typeof vi.fn>)(
+  const response = await vi.mocked(chatWithAdvisor)(
     `The user searched for "${searchQuery}" on a travel platform but got no results. Suggest exactly 3 alternative similar destinations as a JSON array of strings only, no explanation.`,
     []
   );
