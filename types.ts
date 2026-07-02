@@ -192,6 +192,11 @@ export enum Page {
 export interface Destination {
   id: string;
   name: string;
+  country?: string;
+  region?: string;
+  timeZone?: string;
+  currency?: string;
+  languages?: string[];
   description: string;
   attractions: string[];
   foodGuide: string[];
