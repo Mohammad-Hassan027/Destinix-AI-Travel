@@ -186,7 +186,26 @@ export enum Page {
   PackageDetails = 'package_details',
   About = 'about',
   Contact = 'contact',
-  Admin = 'admin'
+  Admin = 'admin',
+  Community = 'community'
+}
+
+export interface TripJournal {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  coverImage?: string;
+  isPublic: boolean;
+  likes: number;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  };
 }
 
 export interface Destination {
