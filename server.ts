@@ -7,6 +7,7 @@ import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
+import jwt from "jsonwebtoken";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
@@ -32,6 +33,9 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "admin@destinix.com,admin@trav
   .split(",")
   .map(email => email.trim().toLowerCase());
 
+// Shared secret used to sign/verify auth tokens (matches authRoutes/userRoutes)
+const JWT_SECRET = process.env.JWT_SECRET || 'destinix_fallback_secret_key_change_in_prod';
+
 // Middleware to verify if the request is from an authorized Admin
 const isAdmin = (req: any, res: any, next: any) => {
   const authHeader = req.headers.authorization;
@@ -41,16 +45,8 @@ const isAdmin = (req: any, res: any, next: any) => {
 
   const token = authHeader.split(" ")[1];
   try {
-    const decodedStr = Buffer.from(token, 'base64').toString('utf-8');
-    const parts = decodedStr.split(".");
-    if (parts.length !== 3) {
-      return res.status(401).json({ error: "Unauthorized. Invalid token format." });
-    }
-
-    const payload = JSON.parse(parts[1]);
-    if (Date.now() > payload.exp) {
-      return res.status(401).json({ error: "Unauthorized. Token expired." });
-    }
+    // jwt.verify checks the signature and expiry, throwing on tampered/expired tokens.
+    const payload = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
 
     if (!ADMIN_EMAILS.includes(payload.email.toLowerCase())) {
       return res.status(403).json({ error: "Forbidden. Admin access required." });
