@@ -55,6 +55,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage, user, onSi
     { id: Page.Home, label: t('navbar.home') },
     { id: Page.Planner, label: t('navbar.planner') },
     { id: Page.Packages, label: t('navbar.packages') },
+    { id: Page.Community, label: "Community" },
     { id: Page.About, label: t('navbar.about') },
     { id: Page.Contact, label: t('navbar.contact') }
   ];

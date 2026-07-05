@@ -29,6 +29,9 @@ import { getPackages } from './services/packageService';
 import { chatWithAdvisor } from './services/geminiService';
 import CollaborativeTrips from './components/collaboration/CollaborativeTrips';
 import GroupDashboard from './components/collaboration/GroupDashboard';
+import CommunityFeed from './components/CommunityFeed';
+import JournalDetails from './components/JournalDetails';
+import CreateJournal from './components/CreateJournal';
 
 // Wrapper for PackageDetails to handle slug-based routing
 const PackageDetailsWrapper: React.FC<{
@@ -84,6 +87,7 @@ const App: React.FC = () => {
     if (path === '/contact') return Page.Contact;
     if (path === '/booking') return Page.Booking;
     if (path === '/privacy-policy') return Page.Home;
+    if (path === '/community' || path.startsWith('/journals/')) return Page.Community;
     if (path === '/admin') return Page.Admin;
     return Page.Home;
   }, [location.pathname]);
@@ -208,6 +212,7 @@ const App: React.FC = () => {
       case Page.Contact: navigate('/contact'); break;
       case Page.Profile: navigate('/profile'); break;
       case Page.Booking: navigate('/booking'); break;
+      case Page.Community: navigate('/community'); break;
       case Page.Admin: navigate('/admin'); break;
       default: navigate('/');
     }
@@ -797,6 +802,9 @@ const App: React.FC = () => {
               <Route path="/profile" element={user ? <Profile user={user} packages={packages} onUpdateProfile={handleUpdateProfile} onNavigate={handleNavPageChange} onViewPackage={handleViewDetails} /> : <Navigate to="/" />} />
               <Route path="/destination-guide/:destId" element={<DestinationGuide />} />
               <Route path="/booking" element={renderBooking()} />
+              <Route path="/community" element={<CommunityFeed onNavigate={handleNavPageChange} />} />
+              <Route path="/journals/new" element={user ? <CreateJournal user={user} /> : <Navigate to="/" />} />
+              <Route path="/journals/:id" element={<JournalDetails />} />
               <Route path="/admin" element={user && ['admin@destinix.com', 'admin@travel.com'].includes(user.email.toLowerCase()) ? <AdminDashboard user={user} onLogout={handleLogout} /> : <Navigate to="/" />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

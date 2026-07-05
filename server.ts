@@ -21,6 +21,7 @@ import destinationGuideRouter from "./server/routes/destinationGuide";
 import authRoutes from "./server/routes/authRoutes";
 import userRoutes from "./server/routes/userRoutes";
 import { initSocket } from "./server/collaboration/socket/socketHandler";
+import journalRoutes from "./server/routes/journalRoutes";
 
 dotenv.config();
 
@@ -101,6 +102,7 @@ const authLimiter = rateLimit({
 app.use("/api", collaborationRoutes);
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/journals", journalRoutes);
 app.use(destinationGuideRouter);
 
 
