@@ -18,10 +18,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # npm install is used instead of npm ci to correctly resolve
-        # platform-specific optional dependencies (e.g. @rollup/rollup-linux-x64-gnu)
-        # that are omitted from a lock file generated on Windows.
         run: npm install
+
+      - name: Install Linux Rollup native binary
+        # The lock file is generated on Windows and omits platform-specific
+        # optional binaries. This step explicitly restores the Linux one.
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -42,10 +44,12 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # npm install is used instead of npm ci to correctly resolve
-        # platform-specific optional dependencies (e.g. @rollup/rollup-linux-x64-gnu)
-        # that are omitted from a lock file generated on Windows.
         run: npm install
+
+      - name: Install Linux Rollup native binary
+        # The lock file is generated on Windows and omits platform-specific
+        # optional binaries. This step explicitly restores the Linux one.
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Generate Prisma Client
         run: npx prisma generate
