@@ -148,7 +148,7 @@ router.put("/:id", async (req, res) => {
       }
     });
 
-    res.json(updatedJournal);
+    res.status(200).json(updatedJournal);
   } catch (err: any) {
     console.error("Error updating journal:", err);
     res.status(500).json({ error: "Failed to update journal" });
@@ -171,7 +171,7 @@ router.delete("/:id", async (req, res) => {
     }
 
     await prisma.tripJournal.delete({ where: { id } });
-    res.json({ success: true, message: "Journal deleted" });
+    res.status(200).json({ success: true, message: "Journal deleted" });
   } catch (err: any) {
     console.error("Error deleting journal:", err);
     res.status(500).json({ error: "Failed to delete journal" });
