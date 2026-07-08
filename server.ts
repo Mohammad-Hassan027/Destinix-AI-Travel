@@ -478,7 +478,7 @@ app.post("/api/verify-otp", (req, res) => {
   const normalizedEmail = email.toLowerCase();
   const stored = otpStore[normalizedEmail];
 
-  console.log(`Verifying OTP for ${normalizedEmail}. Entered: ${otp}, Stored: ${stored?.otp}`);
+  console.log(`OTP verification for: ${normalizedEmail}`);
 
   if (!stored) {
     return res.status(400).json({ error: "No OTP found for this email. Please request a new one." });
